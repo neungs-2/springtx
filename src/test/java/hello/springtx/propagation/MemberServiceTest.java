@@ -131,4 +131,22 @@ class MemberServiceTest {
         // 테스트가 통과하지 못하고 UnexpectedRollbackException를 반환한다.
         // 내부 트랜잭션에서 rollbackOnly 설정을 해두어서 외부 트랜잭션 커밋 시 롤백이 일어나기 때문이다.
     }
+
+    /**
+     * MemberService    @Transactional:ON
+     * MemberRepository @Transactional:ON
+     * LogRepository    @Transactional(REQUIRES_NEW) Exception
+     */
+    @Test
+    void recoverException_success() {
+        //given
+        String username = "로그예외_recoverException_success";
+
+        //when
+        memberService.joinV2(username);
+
+        //then: member 저장, log 롤백
+        assertTrue(memberRepository.find(username).isPresent());
+        assertTrue(logRepository.find(username).isEmpty());
+    }
 }
